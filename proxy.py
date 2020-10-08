@@ -5,13 +5,11 @@ from flask import request
 
 app = Flask(__name__)
 
-host = 'www.google.com'
-
 
 @app.route('/', defaults={'path': ''}, methods=['GET'])
 @app.route('/<path:path>', methods=['GET'])
 def catch_all_get(path):
-    url = create_url(path)
+    url = create_url(path, request.args.get('host'))
 
     try:
         response = requests.get(url)
@@ -29,7 +27,7 @@ def catch_all_get(path):
 @app.route('/', defaults={'path': ''}, methods=['POST'])
 @app.route('/<path:path>', methods=['POST'])
 def catch_all_post(path):
-    url = create_url(path)
+    url = create_url(path, request.args.get('host'))
 
     try:
         response = requests.post(url, data=request.json)
@@ -42,7 +40,7 @@ def catch_all_post(path):
     return response.json()
 
 
-def create_url(path):
+def create_url(path, host):
     url = 'https://{host}/{path}?{query_string}'.format(
         host=host,
         path=path,
